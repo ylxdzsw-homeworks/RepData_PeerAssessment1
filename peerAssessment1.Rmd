@@ -1,0 +1,73 @@
+---
+title: "PeerAssessment1"
+author: "Zhang Shiwei"
+date: "Sunday, September 14, 2014"
+output: html_document
+---
+
+Introduction
+============
+It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the "quantified self" movement -- a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data. 
+
+This script will clean the data and do some analysis.
+
+Loading data
+============
+```{r}
+theData <- read.csv("./activity.csv")
+str(theData)
+```
+
+Mean total number of steps taken per day
+========================================
+```{r}
+totalStepsTakenPerDay <- aggregate(steps ~ date,theData,sum)
+hist(totalStepsTakenPerDay$steps,breaks=10)
+mean(totalStepsTakenPerDay$steps)
+median(totalStepsTakenPerDay$steps)
+```
+
+Average daily activity pattern
+==============================
+```{r}
+averageStepsTakenOfFiveMinuteInterval <- aggregate(steps ~ interval,theData,mean)
+plot(averageStepsTakenOfFiveMinuteInterval,type="l")
+title("Average Steps Taken Of Five Minute Interval")
+IntervalThatHasMaxAverageSteps <- averageStepsTakenOfFiveMinuteInterval[averageStepsTakenOfFiveMinuteInterval$steps == max(averageStepsTakenOfFiveMinuteInterval$steps),"interval"]
+```
+
+The `r IntervalThatHasMaxAverageSteps` five-minute interval has the max average steps
+
+Imputing missing values
+======================
+```{r}
+NumberOfNAs <- nrow(theData[is.na(theData$steps),])
+```
+
+The total number of rows with NAs is `r NumberOfNAs`
+
+I use the mean of the interval to fill NAs:
+```{r}
+for(i in 1:nrow(theData)){
+  if(is.na(theData$steps[i])){
+    theData$steps[i] <- averageStepsTakenOfFiveMinuteInterval$steps[averageStepsTakenOfFiveMinuteInterval$interval==theData$interval[i]]
+  }
+}
+nrow(theData[is.na(theData$steps),])
+```
+
+Total number of steps taken each day now is like following:
+```{r}
+totalStepsTakenPerDay <- aggregate(steps ~ date,theData,sum)
+hist(totalStepsTakenPerDay$steps,breaks=10)
+mean(totalStepsTakenPerDay$steps)
+median(totalStepsTakenPerDay$steps)
+```
+
+We can see it slightly differs from the previous one.
+
+Are there differences in activity patterns between weekdays and weekends?
+=========================================================================
+```{r}
+```
+I haven't finish it but there is no time left...
